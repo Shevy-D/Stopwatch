@@ -3,6 +3,7 @@ package com.shevy.stopwatch
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import java.util.*
@@ -10,11 +11,38 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
     private var seconds: Int = 0
     private var running: Boolean = false
+    private var wasRunning: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        if (savedInstanceState != null) {
+            seconds = savedInstanceState.getInt("seconds")
+            running = savedInstanceState.getBoolean("running")
+            wasRunning = savedInstanceState.getBoolean("wasRunning")
+        }
         runTime()
+    }
+
+    override fun onSaveInstanceState(saveInstanceState: Bundle) {
+        super.onSaveInstanceState(saveInstanceState)
+        saveInstanceState.putInt("seconds", seconds)
+        saveInstanceState.putBoolean("running", running)
+        saveInstanceState.putBoolean("wasRunning", wasRunning)
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        wasRunning = running
+        running = false
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (wasRunning) {
+            running = true
+        }
     }
 
     fun onClickStart(view: View) {
